@@ -1,63 +1,59 @@
-import Image from "next/image";
+'use client';
+import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 
-export default function Home() {
+export default function UserCatalog() {
+  const [shoes, setShoes] = useState<any[]>([]);
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    fetch('/api/shoes').then(res => res.json()).then(data => {
+      if(data.success) setShoes(data.data);
+    });
+  }, []);
+
+  const filteredShoes = useMemo(() => {
+    return shoes.filter(s => 
+      s.name.toLowerCase().includes(search.toLowerCase()) || s.brand.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [search, shoes]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-gray-50 font-sans text-slate-800">
+      <nav className="bg-white shadow-sm px-8 py-4 flex justify-between items-center sticky top-0 z-10">
+        <h1 className="text-2xl font-black">Kicks<span className="text-indigo-600">Store</span></h1>
+        <Link href="/admin" className="px-4 py-2 text-sm font-semibold text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition">
+          Login Admin 
+        </Link>
+      </nav>
+
+      <main className="max-w-7xl mx-auto p-8">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
+          <div>
+            <h2 className="text-4xl font-extrabold">Katalog Terbaru</h2>
+            <p className="text-slate-500 mt-2 text-lg">Temukan sepatu impianmu hari ini.</p>
+          </div>
+          <input 
+            type="text" placeholder="Cari merk atau nama..." 
+            className="w-full md:w-1/3 px-4 py-3 rounded-xl border border-slate-200 shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          {filteredShoes.map((shoe) => (
+            <div key={shoe.id} className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-xl transition-all border border-slate-100 group">
+              <div className="h-48 rounded-xl bg-slate-100 mb-4 overflow-hidden">
+                <img src={shoe.image_url} alt={shoe.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              </div>
+              <h3 className="font-bold text-lg">{shoe.name}</h3>
+              <p className="text-sm text-slate-500 mb-4">{shoe.brand}</p>
+              <div className="flex justify-between items-center">
+                <span className="font-extrabold text-indigo-600">Rp {shoe.price.toLocaleString('id-ID')}</span>
+                <button onClick={() => alert('Fitur checkout dalam pengembangan')} className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-800">Beli</button>
+              </div>
+            </div>
+          ))}
         </div>
       </main>
     </div>
