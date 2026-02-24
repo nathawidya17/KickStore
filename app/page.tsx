@@ -47,11 +47,12 @@ export default function UserCatalog() {
                 <img src={shoe.image_url} alt={shoe.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               </div>
               <h3 className="font-bold text-lg">{shoe.name}</h3>
-              <p className="text-sm text-slate-500 mb-4">{shoe.brand}</p>
+              <p className="text-sm text-slate-500 mb-4">{shoe.brand} | {shoe.size}</p>
               <div className="flex justify-between items-center">
                 <span className="font-extrabold text-indigo-600">Rp {shoe.price.toLocaleString('id-ID')}</span>
                 <button onClick={() => alert('Fitur checkout dalam pengembangan')} className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-800">Beli</button>
               </div>
+             
             </div>
           ))}
         </div>

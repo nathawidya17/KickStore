@@ -20,8 +20,10 @@ export async function POST(req: Request) {
     
     const name = formData.get('name') as string;
     const brand = formData.get('brand') as string;
+    const size = formData.get('size') as string;
     const price = Number(formData.get('price'));
     const file = formData.get('image') as File;
+    const description = formData.get('description') as string || '-';
     
     let image_url = '';
 
@@ -46,7 +48,7 @@ export async function POST(req: Request) {
     }
 
     // Simpan data ke database
-    await repo.create({ name, brand, price, image_url, description: '-' });
+    await repo.create({ name, brand, size: '', price, image_url, description });
     
     return NextResponse.json({ success: true, message: 'Sepatu berhasil ditambahkan!' });
   } catch (error: any) {

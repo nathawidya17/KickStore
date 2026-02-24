@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Pencil, Trash2 } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -11,10 +12,9 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(false);
   
   const [shoes, setShoes] = useState<any[]>([]);
-  const [form, setForm] = useState({ name: '', brand: '', price: 0 });
+  const [form, setForm] = useState({ name: '', brand: '', size: '', price: 0 });
   const [imageFile, setImageFile] = useState<File | null>(null);
   
-  //  STATE BARU: Menyimpan ID sepatu yang sedang diedit
   const [editingId, setEditingId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -53,13 +53,13 @@ export default function AdminDashboard() {
 
   const handleEditClick = (shoe: any) => {
     setEditingId(shoe.id); 
-    setForm({ name: shoe.name, brand: shoe.brand, price: shoe.price }); 
+    setForm({ name: shoe.name, brand: shoe.brand, size: shoe.size, price: shoe.price}); 
     window.scrollTo({ top: 0, behavior: 'smooth' }); 
   };
 
   const handleCancelEdit = () => {
     setEditingId(null);
-    setForm({ name: '', brand: '', price: 0 });
+    setForm({ name: '', brand: '', size: '', price: 0 });
     setImageFile(null);
     const fileInput = document.getElementById('fileUpload') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
@@ -75,7 +75,10 @@ export default function AdminDashboard() {
     const formData = new FormData();
     formData.append('name', form.name);
     formData.append('brand', form.brand);
+    formData.append('size', form.size);
     formData.append('price', form.price.toString());
+
+    
     if (imageFile) formData.append('image', imageFile); 
 
     try {
@@ -142,16 +145,15 @@ export default function AdminDashboard() {
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <input type="text" placeholder="Nama Sepatu" required value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="border border-slate-200 p-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition text-black" />
               <input type="text" placeholder="Merk" required value={form.brand} onChange={e => setForm({...form, brand: e.target.value})} className="border border-slate-200 p-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition text-black" />
+              <input type="text" placeholder="Ukuran" required value={form.size} onChange={e => setForm({...form, size: e.target.value})} className="border border-slate-200 p-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition text-black" />
               <input type="number" placeholder="Harga" required value={form.price || ''} onChange={e => setForm({...form, price: Number(e.target.value)})} className="border border-slate-200 p-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition text-black" />
-              
-              {/* --- CUSTOM FILE UPLOAD UI --- */}
+              <></>
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-semibold text-black">
                   {editingId ? 'Upload Foto Baru (Opsional)' : 'Upload Foto Sepatu'}
                 </label>
                 
                 <div className="relative">
-                  {/* Input aslinya disembunyikan menggunakan class 'hidden' */}
                   <input 
                     id="fileUpload" 
                     type="file" 
@@ -161,7 +163,6 @@ export default function AdminDashboard() {
                     className="hidden" 
                   />
                   
-                  {/* Label ini yang diklik sebagai pengganti input file */}
                   <label 
                     htmlFor="fileUpload"
                     className={`flex items-center justify-between border p-3 rounded-lg cursor-pointer transition ${
@@ -169,7 +170,6 @@ export default function AdminDashboard() {
                     }`}
                   >
                     <span className={`text-sm truncate mr-2 ${imageFile ? 'text-indigo-700 font-semibold' : 'text-slate-400'}`}>
-                      {/* Logika menampilkan nama file */}
                       {imageFile ? imageFile.name : (editingId ? 'Gunakan foto lama, atau pilih baru...' : 'Pilih file gambar...')}
                     </span>
                     <span className="bg-slate-800 text-white py-1 px-3 rounded text-xs font-bold whitespace-nowrap">
@@ -178,7 +178,6 @@ export default function AdminDashboard() {
                   </label>
                 </div>
               </div>
-              {/* ----------------------------- */}
 
               <div className="flex gap-2 mt-2">
                 <button type="submit" className="flex-1 bg-slate-900 text-white p-3 rounded-lg font-bold hover:bg-slate-800 transition">
@@ -196,10 +195,11 @@ export default function AdminDashboard() {
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="p-6 border-b border-slate-100"><h2 className="font-bold text-lg text-slate-800">Daftar Inventori Sepatu</h2></div>
             <table className="w-full text-left border-collapse">
-              <thead><tr className="bg-slate-50 text-slate-600 text-sm"><th className="p-4">Produk</th><th className="p-4">Harga</th><th className="p-4">Aksi</th></tr></thead>
-              <tbody>
+              <thead><tr className="bg-slate-50 text-slate-600 text-sm"><th className="p-4">Produk</th><th className="p-4">Harga</th><th className="p-4">Ukuran</th><th className="p-4">Aksi</th></tr></thead>
+             <tbody>
                 {shoes.map(shoe => (
                   <tr key={shoe.id} className="hover:bg-slate-50 transition border-b border-slate-50">
+                    {/* Kolom 1: Produk */}
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <img src={shoe.image_url} alt="img" className="w-12 h-12 rounded bg-slate-100 object-cover border" />
@@ -209,11 +209,35 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 font-semibold text-slate-700">Rp {shoe.price.toLocaleString('id-ID')}</td>
+
+                    {/* Kolom 2: Harga */}
+                    <td className="p-4 font-semibold text-slate-700">
+                      Rp {shoe.price.toLocaleString('id-ID')}
+                    </td>
+
+                    {/* Kolom 3: Ukuran (Sesuai Header ke-3) */}
+                    <td className="p-4 text-slate-600 font-medium text-sm">
+                      {shoe.size || '-'}
+                    </td>
+
+                    {/* Kolom 4: Aksi */}
                     <td className="p-4">
                       <div className="flex gap-2">
-                        <button onClick={() => handleEditClick(shoe)} className="text-indigo-600 font-bold bg-indigo-50 px-3 py-1 rounded-md hover:bg-indigo-100 transition">Edit</button>
-                        <button onClick={() => handleDelete(shoe.id)} className="text-red-500 font-bold bg-red-50 px-3 py-1 rounded-md hover:bg-red-100 transition">Hapus</button>
+                        <button 
+                          onClick={() => handleEditClick(shoe)} 
+                          className="p-2 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition shadow-sm"
+                          title="Edit Data"
+                        >
+                          <Pencil size={18} strokeWidth={2.5} />
+                        </button>
+
+                        <button 
+                          onClick={() => handleDelete(shoe.id)} 
+                          className="p-2 text-red-500 bg-red-50 rounded-lg hover:bg-red-100 transition shadow-sm"
+                          title="Hapus Data"
+                        >
+                          <Trash2 size={18} strokeWidth={2.5} />
+                        </button>
                       </div>
                     </td>
                   </tr>

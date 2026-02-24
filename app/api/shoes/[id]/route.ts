@@ -25,8 +25,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const formData = await req.formData();
     const name = formData.get('name') as string;
     const brand = formData.get('brand') as string;
+    const size = formData.get('size') as string;
     const price = Number(formData.get('price'));
     const file = formData.get('image') as File | null;
+    const description = formData.get('description') as string || '-';
     
     let image_url = '';
 
@@ -40,7 +42,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     }
 
     const repo = new ShoeRepository();
-    await repo.update(id, { name, brand, price, image_url });
+    await repo.update(id, { name, brand, price, image_url, description, size });
     
     return NextResponse.json({ success: true, message: 'Data berhasil diubah!' });
   } catch (error: any) {

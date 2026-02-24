@@ -7,6 +7,7 @@ export class Shoe {
     public id: number, 
     public name: string, 
     public brand: string,
+    public size: string,
     public price: number, 
     public image_url: string, 
     public description: string
@@ -26,8 +27,8 @@ export class ShoeRepository {
   // 2. Create (Insert)
   async create(shoe: Omit<Shoe, 'id'>): Promise<void> {
     await this.db.execute(
-      'INSERT INTO shoes (name, brand, price, image_url, description) VALUES (?, ?, ?, ?, ?)',
-      [shoe.name, shoe.brand, shoe.price, shoe.image_url, shoe.description] as any[] 
+      'INSERT INTO shoes (name, brand, size, price, image_url, description) VALUES (?, ?, ?, ?, ?, ?)',
+      [shoe.name, shoe.brand, shoe.size, shoe.price, shoe.image_url, shoe.description] as any[] 
     );
   }
 
@@ -40,13 +41,13 @@ export class ShoeRepository {
   async update(id: number, shoe: Partial<Shoe>): Promise<void> {
     if (shoe.image_url) {
       await this.db.execute(
-        'UPDATE shoes SET name=?, brand=?, price=?, image_url=? WHERE id=?',
-        [shoe.name, shoe.brand, shoe.price, shoe.image_url, id] as any[] 
+        'UPDATE shoes SET name=?, brand=?, size=?, price=?, image_url=? WHERE id=?',
+        [shoe.name, shoe.brand, shoe.size, shoe.price, shoe.image_url, id] as any[] 
       );
     } else {
       await this.db.execute(
-        'UPDATE shoes SET name=?, brand=?, price=? WHERE id=?',
-        [shoe.name, shoe.brand, shoe.price, id] as any[] 
+        'UPDATE shoes SET name=?, brand=?, size=?, price=? WHERE id=?',
+        [shoe.name, shoe.brand, shoe.size, shoe.price, id] as any[] 
       );
     }
   }
